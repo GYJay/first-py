@@ -1,31 +1,32 @@
-import  uuid, functools, threading, logging, time
+import  uuid, functools, threading, logging, times
 
-#数据库引擎对象：
+# 数据库引擎对象：sd
 class _Engine(object):
-    def __init__(self,connect):
-        self._connect=connect
+    def __init__(self, connect):
+        self._connect = connect
+
     def connect(self):
         return self._connect
 
-engine=None
+engine = None
 
 
 # 持有数据库连接的上下文对象:
 class _DbCtx(threading.local):
     def __init__(self):
-        self.connect=None
-        self.transction=0
+        self.connect = None
+        self.transction = 0
     def is_init(self):
         return not self.connect is None
     def init(self):
-        self.connect=_LasyConnection()
-        self.transction=0
+        self.connect = _LasyConnection()
+        self.transction = 0
     def cleanup(self):
         self.connect.cleanup()
-        self.connect=None
+        self.connect = None
     def cursor(self):
         return self.connect.cursor()
-_db_ctx=_DbCtx()
+_db_ctx = _DbCtx()
 
 
 
@@ -54,12 +55,12 @@ class _LasyConnection(object):
             logging.info('close connection <%s>...' % hex(id(connection)))
             connection.close()
 
-#ORM
+# ORM
 class Dict(dict):
-    def __init__(self,names=(),values=(),**kw):
-        super(Dict,self).__init__(**kw)
-        for k,v in zip(names,values):
-            self[k]=v
+    def __init__(self, names = (), values = (), **kw):
+        super(Dict, self).__init__(**kw)
+        for k, v in zip(names, values):
+            self[k] = v
 
     def __getattr__(self, key):
         try:
@@ -67,10 +68,10 @@ class Dict(dict):
         except KeyError:
             raise AttributeError(r"dict has no attribute '%s'" %key)
     def __setattr__(self, key, value):
-        self[key]=value
+        self[key] = value
 
-def next_id(t=None):
+def next_id(t = None):
     if t is None:
-        t=time.time()
+        t = time.time()
     return '%015d%s000' % (int(t * 1000), uuid.uuid4().hex)
 
